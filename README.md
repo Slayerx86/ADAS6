@@ -11,7 +11,7 @@ Le document sera un fichier pdf, que vous m'enverrez pas mail le 11 mars au plus
 Par  exemple,  pour  un  binôme  constitué  de  Eric  Andres  et  moi-même,  cela  donnerait Andres_E_Geniet_SDAudit.pdf.
 En parallèle, prévoyez les scenarii de test associés aux user stories (vous pouvez bien sûr   en   ajouter   d’autres   qui   vous   sembleraient   pertinentes).   Cela   guidera   vos développements en précisant ce que vous voulez faire.
 
-our la soutenance
+Pour la soutenance
 3.Développer  les  fonctionnalités  de  l’application  et  un  programme  principal  qui  permet  de les mettre en œuvre (en tenant compte des retours faits sur votre premier document!)
 4.Venir avec un listing, et une synthèse claire de ce que chacun a fait dans le projet.
 5.Fournir un récapitulatif des tests des user stories (ce qui marche comme attendu, ce qui produit des résultats différents, ce qui n’est pas opérationnel)
