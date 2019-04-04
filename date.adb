@@ -168,7 +168,7 @@ package body Date is
                else
                   return (1, 3, Ref.A);
                end if;
-            elsif (Ref.J = 29) then
+            elsif (Ref.J > 28) then
                return (1, 3, Ref.A);
             else
                return (Ref.J+1, Ref.M, Ref.A);
@@ -200,64 +200,6 @@ package body Date is
    end Lendemain;
 
 
-   function Jour_Suivant (
-         Ref,
-         Duree : R_Date)
-     return R_Date is
-
-      D : R_Date;
-
-   begin
-
-      D.A := Ref.A + Duree.A;
-
-      D.M := (Ref.M + Duree.M) mod 12;
-      D.A := D.A + (Ref.M + Duree.M) / 12;
-
-      case D.M is
-
-         when 2 =>
-            if ( Ref.J + Duree.J <= 28) then
-               D.J := Ref.J + Duree.J;
-            elsif ( Ref.J + Duree.J = 29 and then Bissextile(D.A) ) then
-               D.J := 29;
-            else
-               D.J := (Ref.J + Duree.J) mod 28;
-               D.M := 3;
-            end if;
-
-         when 12 =>
-            if ( Ref.J + Duree.J <= 31) then
-               D.J := Ref.J + Duree.J;
-            else
-               D.J := (Ref.J + Duree.J) mod 31;
-               D.M := 1;
-               D.A := D.A + 1;
-            end if;
-
-         when 4|6|9|11 =>
-            if ( Ref.J + Duree.J <= 30) then
-               D.J := Ref.J + Duree.J;
-            else
-               D.J := (Ref.J + Duree.J) mod 30;
-               D.M := D.M + 1;
-            end if;
-
-         when others =>
-            if ( Ref.J + Duree.J <= 31) then
-               D.J := Ref.J + Duree.J;
-            else
-               D.J := (Ref.J + Duree.J) mod 31;
-               D.M := D.M + 1;
-            end if;
-
-      end case;
-
-      return D;
-
-   end Jour_Suivant;
-
-
    function "+" (
          Ref   : R_Date;
          Duree : Integer)
@@ -276,6 +218,44 @@ package body Date is
    end "+";
 
 
+   function "-" (
+         Ref   : R_Date;
+         Duree : Integer)
+     return R_Date is
+
+      D : R_Date := Ref;
+
+   begin
+
+      for I in 1..Duree loop
+
+         case D.J is
+
+            when 1 =>
+               case D.M is
+                  when 1 =>
+                     D.M := 12;
+                     D.A := D.A - 1;
+                  when others =>
+                     D.M := D.M - 1;
+               end case;
+               D.J := 31;
+               while (not Is_Date_Valide(D)) loop
+                  D.J := D.J - 1;
+               end loop;
+
+            when others =>
+               D.J := D.J - 1;
+
+         end case;
+
+      end loop;
+
+      return D;
+
+   end "-";
+
+
    function "*" (
          Ref   : R_Date;
          Duree : Integer)
@@ -285,8 +265,39 @@ package body Date is
 
    begin
 
-      D.M := (Ref.M + Duree) mod 12;
-      D.A := D.A + (Ref.M + Duree) / 12;
+      if (Duree = 0) then
+
+         return D;
+
+      elsif (Duree > 0) then
+
+         for I in 1..Duree loop
+            case D.M is
+               when 12 =>
+                  D.M := 1;
+                  D.A := D.A + 1;
+               when others =>
+                  D.M := D.M + 1;
+            end case;
+         end loop;
+
+      else
+
+         for I in 1..-Duree loop
+            case D.M is
+               when 1 =>
+                  D.M := 12;
+                  D.A := D.A - 1;
+               when others =>
+                  D.M := D.M - 1;
+            end case;
+         end loop;
+
+      end if;
+
+      if (not Is_Date_Valide(D)) then
+         D := Lendemain(D);
+      end if;
 
       return D;
 

@@ -73,7 +73,7 @@ package body Types_Enum is
    begin
 
       while (D not in 1..10) loop
-         Put("Saisir un entier entre 1 et 10 compris : ");
+         Put(" (de 1 a 10) : ");
          begin
             Get(D);
             Skip_Line;

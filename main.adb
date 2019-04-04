@@ -1,75 +1,18 @@
-with Ada.Text_Io, Ada.Integer_Text_Io;
-use Ada.Text_Io, Ada.Integer_Text_Io;
+with Ada.Text_Io;
+use Ada.Text_Io;
 
-with Date, Types_Enum, Kit, Employe;
-use Date, Types_Enum, Kit, Employe;
+with Date, Kit, Employe, Societe, Audit;
+use Date, Kit, Employe, Societe, Audit;
 
 procedure Main is
 
+   D        : R_Date   := (1, 4, 2019);
+   Compteur : Positive := 14;
 
-   --   type R_Societe;
-   --   type P_Societe is access R_Societe;
-   --   type R_Societe is
-   --      record
-   --         Nom  : T_Mot;
-   --         Date : R_Date;
-   --         Res  : T_Resultat;
-   --         Next : P_Societe;
-   --      end record;
-
-
-   --   type R_Audit_Attente;
-   --   type P_Audit_Attente is access R_Audit_Attente;
-   --   type R_Audit_Attente is
-   --      record
-   --         Id      : Positive;
-   --         Duree   : T_Duree;
-   --         Debut   : R_Date;
-   --         Urgent  : Boolean;
-   --         Qualite : T_Qualite;
-   --         Societe : T_Mot;
-   --         Kit     : T_Nature;
-   --         Next    : P_Audit_Attente;
-   --      end record;
-
-   --   type R_Audit_En_Cours;
-   --   type P_Audit_En_Cours is access R_Audit_En_Cours;
-   --   type R_Audit_En_Cours is
-   --      record
-   --         Id      : Positive;
-   --         Duree   : T_Duree;
-   --         Debut,
-   --         Fin     : R_Date;
-   --         Kit     : P_Kit;
-   --         Employe : P_Employe;
-   --         Societe : P_Societe;
-   --         Next    : P_Audit_En_Cours;
-   --      end record;
-
-
-   --   type R_Audit_Historique;
-   --   type P_Audit_Historique is access R_Audit_Historique;
-   --   type R_Audit_Historique is
-   --      record
-   --         Id       : Positive;
-   --         Duree    : T_Duree;
-   --         Fin      : R_Date;
-   --         Res      : T_Resultat;
-   --         Type_Kit : T_Nature;
-   --         Id_Kit   : Positive;
-   --         Employe  : T_Mot;
-   --         Next     : P_Audit_Historique;
-   --      end record;
-
-
-   Da : R_Date := (1, 3, 2019);
-
-   --   N : T_Nature;
-   --   Q : T_Qualite;
-   --   S : T_Status;
-   --   R : T_Resultat;
-   Kit : P_Kit     := null;
-   Emp : P_Employe := null;
+   Kit     : P_Kit         := null;
+   Emp     : P_Employe     := null;
+   Societe : P_Societe     := null;
+   Audit   : T_Liste_Audit;
 
    procedure Menu_1 is
 
@@ -93,6 +36,9 @@ procedure Main is
 
             when '1' =>
                Nouveau_Employe(Emp);
+
+            when '2' =>
+               Depart_Employe(Emp);
 
             when '3' =>
                Consultation_Employe(Emp);
@@ -130,7 +76,7 @@ procedure Main is
          case Choix is
 
             when '1' =>
-               Nouveau_Kit(Kit, Da);
+               Nouveau_Kit(Kit, D);
 
             when '2' =>
                Stock_Kit(Kit);
@@ -157,7 +103,7 @@ procedure Main is
       loop
 
          Put_Line("1 => Demande");
-         Put_Line("2 => Listes d'attentes");
+         Put_Line("2 => Listes des audits");
          Put_Line("3 => Retour");
 
          Put("Choix : ");
@@ -166,6 +112,12 @@ procedure Main is
          New_Line;
 
          case Choix is
+
+            when '1' =>
+               Demande_Audit(Audit, Compteur, D);
+
+            when '2' =>
+               Put(Audit);
 
             when '3' =>
                exit;
@@ -191,7 +143,8 @@ procedure Main is
          Put_Line("1 => Audits par employe");
          Put_Line("2 => Audits par societe");
          Put_Line("3 => Audits par date");
-         Put_Line("4 => Retour");
+         Put_Line("4 => Resultats des societes");
+         Put_Line("5 => Retour");
 
          Put("Choix : ");
          Get(Choix);
@@ -201,6 +154,9 @@ procedure Main is
          case Choix is
 
             when '4' =>
+               Put(Societe);
+
+            when '5' =>
                exit;
 
             when others =>
@@ -209,8 +165,6 @@ procedure Main is
          end case;
 
       end loop;
-
-      New_Line;
 
    end Menu_5;
 
@@ -224,7 +178,7 @@ procedure Main is
       loop
 
          Put("Date du jour : ");
-         Put(Da);
+         Put(D);
          New_Line;
          New_Line;
 
@@ -252,7 +206,8 @@ procedure Main is
                Menu_3;
 
             when '4' =>
-               Da := Lendemain(Da);
+               D := Lendemain(D);
+               Peremption_Kit(Kit, D);
 
             when '5' =>
                Menu_5;
@@ -271,26 +226,19 @@ procedure Main is
 
 begin
 
-   --   Get(Da);
-   --   Put(Da);
+   Load_Employe(Emp);
+   Load_Kit(Kit);
+   Load_Societe(Societe);
 
-   --   Get(N);
-   --   Put(N);
-   --   New_Line;
-
-   --   Get(Q);
-   --   Put(Q);
-   --   New_Line;
-
-   --   Get(S);
-   --   Put(S);
-   --   New_Line;
-
-   --   Get(R);
-   --   Put(R);
-   --   New_Line;
+   Load(Audit, Kit, Emp, Societe);
 
    Menu_Principal;
+
+   Save_Employe(Emp);
+   Save_Kit(Kit);
+   Save_Societe(Societe);
+
+   Save(Audit);
 
 end Main;
 

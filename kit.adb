@@ -3,6 +3,10 @@ use Ada.Text_Io, Ada.Integer_Text_Io;
 
 package body Kit is
 
+
+   --------------------------------   saisie affichage   --------------------------------
+
+
    procedure Put (
          K : in     P_Kit) is
    begin
@@ -10,21 +14,21 @@ package body Kit is
       if (K /= null) then
 
          Put("Kit ");
-         Put(K.Nature);
+         Put(K.Atr.Nature);
          Put(' ');
-         Put(K.Id, 0);
+         Put(K.Atr.Id, 0);
          New_Line;
 
          Put("Nombre d'utilisation : ");
-         Put(K.Utilisation, 0);
+         Put(K.Atr.Utilisation, 0);
          New_Line;
 
          Put("Date de peremption : ");
-         Put(K.Peremption);
+         Put(K.Atr.Peremption);
          New_Line;
 
          Put("Etat : ");
-         if (K.Utilise) then
+         if (K.Atr.Utilise) then
             Put_Line("en cours d'utilisation");
          else
             Put_Line("disponible");
@@ -48,14 +52,19 @@ package body Kit is
    end Put_All;
 
 
+   --------------------------------   prive   --------------------------------
+
+
    procedure New_Kit (
          K   : in out P_Kit;
          Id  : in     Positive;
          Nat : in     T_Nature;
          Per : in     R_Date) is
+      Kit : T_Kit;
    begin
 
-      K := new R_Kit'(Id, Nat, Per, 0, False, K);
+      Kit := (Id, Nat, Per, 0, False);
+      K := new R_Kit'(Kit, K);
 
    end;
 
@@ -85,7 +94,7 @@ package body Kit is
 
       else
 
-         if (K.Id = Id) then
+         if (K.Atr.Id = Id) then
             return True;
          else
             return Is_Kit_In(K.Next, Id);
@@ -96,7 +105,7 @@ package body Kit is
    end;
 
 
-   --------------------------------
+   --------------------------------   publique   --------------------------------
 
 
    procedure Nouveau_Kit (
@@ -148,7 +157,7 @@ package body Kit is
 
       end if;
 
-   end Nouveau_kit;
+   end Nouveau_Kit;
 
 
    procedure Stock_Kit (
@@ -162,7 +171,89 @@ package body Kit is
          Put_All(K);
       end if;
 
-   end Stock_kit;
+   end Stock_Kit;
 
+
+   procedure Peremption_Kit (
+         K : in out P_Kit;
+         D : in     R_Date) is
+   begin
+
+      if (K /= null) then
+
+         if (Anterieur(K.Atr.Peremption, D)) then
+
+            Put("Suppression du kit ");
+            Put(K.Atr.Id, 0);
+            New_Line;
+
+            Del_Kit(K);
+            Peremption_Kit(K, D);
+
+         else
+
+            Peremption_Kit(K.Next, D);
+
+         end if;
+
+      end if;
+
+   end Peremption_Kit;
+
+
+   procedure Load_Kit (
+         Kit :    out P_Kit) is
+      File : File_Kit.File_Type;
+      K    : T_Kit;
+   begin
+
+      Open(File, In_File, "kit.arc");
+
+      while (not End_Of_File(File)) loop
+         Read(File, K);
+         Kit := new R_Kit'(K, Kit);
+      end loop;
+
+      Close(File);
+
+   end Load_Kit;
+
+
+   procedure Save_Kit (
+         Kit : in     P_Kit) is
+      File : File_Kit.File_Type;
+
+      procedure Save (
+            Kit : in     P_Kit) is
+      begin
+         if (Kit.Next /= null) then
+            Save(Kit.Next);
+         end if;
+         Write(File, Kit.Atr);
+      end Save;
+
+   begin
+
+      Create(File, Append_File, "kit.arc");
+      Save(Kit);
+      Close(File);
+
+   end Save_Kit;
+
+   function Find (
+         Id  : Positive;
+         Kit : P_Kit)
+     return P_Kit is
+   begin
+      
+      if (Kit = null) then
+         return null;
+      elsif (Kit.Atr.Id = Id) then
+         return Kit;
+      else
+         return Find(Id,Kit.Next);
+      end if;
+
+   end Find;
 
 end Kit;
