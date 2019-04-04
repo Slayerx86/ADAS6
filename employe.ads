@@ -1,21 +1,27 @@
-with Ada.Unchecked_Deallocation;
+with Ada.Unchecked_Deallocation, Ada.Sequential_Io;
 
-with Types_Enum, Date;
-use Types_Enum, Date;
+with Types_Enum;
+use Types_Enum;
 
 package Employe is
+
+   type T_Employe is
+      record
+         Nom,
+         Prenom             : T_Mot     := (others => ' ');
+         Qualite            : T_Qualite;
+         Nb_Intervention,
+         Temps_Intervention,
+         Conge              : Natural;
+         Status             : T_Status;
+      end record;
 
    type R_Employe;
    type P_Employe is access R_Employe;
    type R_Employe is
       record
-         Nom,
-         Prenom       : T_Mot;
-         Qualite      : T_Qualite;
-         Intervention : Natural;
-         Conge        : Natural;
-         Status       : T_Status;
-         Next         : P_Employe;
+         Atr  : T_Employe;
+         Next : P_Employe;
       end record;
 
    procedure Del is
@@ -23,33 +29,38 @@ package Employe is
       R_Employe,
       P_Employe);
 
+   package File_Employe is new Ada.Sequential_Io(T_Employe);
+   use File_Employe;
+
+   -- saisie affichage
+
    procedure Put (
          E : in     P_Employe);
 
    procedure Put_All (
          E : in     P_Employe);
 
-   procedure New_Employe (
-         E : in out P_Employe;
-         N,
-         P : in     String;
-         Q : in     T_Qualite);
-
-   procedure Del_Employe (
-         E : in out P_Employe);
-
-   function Is_Employe_In (
-         E : in     P_Employe;
-         N,
-         P : in     T_Mot)
-     return Boolean;
-
-   ----------------------------------------
+   -- publique
 
    procedure Nouveau_Employe (
          E : in out P_Employe);
 
+   procedure Depart_Employe (
+         E : in out P_Employe);
+
    procedure Consultation_Employe (
-         E : in P_Employe);
+         E : in     P_Employe);
+
+   procedure Load_Employe (
+         Emp :    out P_Employe);
+
+   procedure Save_Employe (
+         Emp : in     P_Employe);
+
+   function Find (
+         N,
+         P   : T_Mot;
+         Emp : P_Employe)
+     return P_Employe;
 
 end Employe;

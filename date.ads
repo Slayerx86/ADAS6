@@ -38,6 +38,11 @@ package Date is
          Duree : Integer)
      return R_Date;
 
+   function "-" (
+         Ref   : R_Date;
+         Duree : Integer)
+     return R_Date;
+
    function "*" (
          Ref   : R_Date;
          Duree : Integer)
